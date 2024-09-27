@@ -28,6 +28,7 @@ jobs:
   create-release-pr:
     name: create release pr
     runs-on: ubuntu-latest
+    needs: create-release-branch
     if: always()
     steps:
       - name: Checkout code
