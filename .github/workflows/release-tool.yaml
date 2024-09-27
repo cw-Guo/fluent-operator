@@ -1,0 +1,54 @@
+name: Create Release Pull Request
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'New version number (e.g., v2.2.0)'
+        required: true
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+
+      - name: Create release branch
+        run: |
+          git checkout -b release-${{ github.event.inputs.version }}
+
+      - name: Update version in manifests
+        run: |
+          sed -i 's/fluent-operator:latest/fluent-operator: ${{ github.event.inputs.version }}/' manifests/setup/fluent-operator-deployment.yaml
+          sed -i 's/fluent-operator:latest/fluent-operator: ${{ github.event.inputs.version }}/' manifests/setup/setup.yaml
+
+      - name: Update version in values.yaml
+        run: |
+          sed -i 's/tag: .*/tag: ${{ github.event.inputs.version }}/' charts/fluent-operator/values.yaml
+      - name: Update version
+        run: |
+          sed -i 's/latest/${{ github.event.inputs.version }}/' VERSION
+      - name: Commit changes
+        run: |
+          git add manifests/setup/fluent-operator-deployment.yaml manifests/setup/setup.yaml charts/fluent-operator/values.yaml
+          git commit -m "Bump version to ${{ github.event.inputs.version }}"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: "Release ${{ github.event.inputs.version }}"
+          body: |
+            This PR updates the version to ${{ github.event.inputs.version }} in the following files:
+            - manifests/setup/fluent-operator-deployment.yaml
+            - manifests/setup/setup.yaml
+
+            Please review and merge to release the new version.
+          branch: release-${{ github.event.inputs.version }}
+          base: main
+          labels: release
