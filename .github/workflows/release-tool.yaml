@@ -50,7 +50,7 @@ jobs:
 
       - name: Update version in values.yaml
         run: |
-          sed -i '/repository: "kubesphere\/fluent-operator"/!b;n;s/tag: latest/tag: "${{ github.event.inputs.version }}"/' charts/fluent-operator/values.yaml
+          sed -i '/repository: "kubesphere\/fluent-operator"/!b;n;s/tag: "latest"/tag: "${{ github.event.inputs.version }}"/' charts/fluent-operator/values.yaml
 
       - name: Update version
         run: |
