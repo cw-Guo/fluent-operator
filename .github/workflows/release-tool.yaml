@@ -62,18 +62,18 @@ jobs:
           git commit -m "Bump version to ${{ github.event.inputs.version }}"
           git push --set-upstream origin release-release-${{ github.event.inputs.version }} --force
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          title: "Release ${{ github.event.inputs.version }}"
-          body: |
-            This PR updates the version to ${{ github.event.inputs.version }} in the following files:
-            - manifests/setup/fluent-operator-deployment.yaml
-            - manifests/setup/setup.yaml
-            - charts/fluent-operator/values.yaml
-            - VERSION
+      # - name: Create Pull Request
+      #   uses: peter-evans/create-pull-request@v5
+      #   with:
+      #     title: "Release ${{ github.event.inputs.version }}"
+      #     body: |
+      #       This PR updates the version to ${{ github.event.inputs.version }} in the following files:
+      #       - manifests/setup/fluent-operator-deployment.yaml
+      #       - manifests/setup/setup.yaml
+      #       - charts/fluent-operator/values.yaml
+      #       - VERSION
 
-            Please review and merge to release the new version.
-          branch: release-release-${{ github.event.inputs.version }}
-          base: release-${{ github.event.inputs.version }}
-          labels: release
+      #       Please review and merge to release the new version.
+      #     branch: release-release-${{ github.event.inputs.version }}
+      #     base: release-${{ github.event.inputs.version }}
+      #     labels: release
