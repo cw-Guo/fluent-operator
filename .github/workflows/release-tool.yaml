@@ -8,6 +8,22 @@ on:
         required: true
 
 jobs:
+  create-release-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+
+     - name: Create release branch
+        run: |
+          git checkout -b release-${{ github.event.inputs.version }}
+          git push --set-upstream origin release-${{ github.event.inputs.version }}
+  
   create-release-pr:
     runs-on: ubuntu-latest
     steps:
@@ -21,24 +37,26 @@ jobs:
 
       - name: Create release branch
         run: |
-          git checkout -b release-${{ github.event.inputs.version }}
+          git checkout -b release-release-${{ github.event.inputs.version }}
 
       - name: Update version in manifests
         run: |
-          sed -i 's/fluent-operator:latest/fluent-operator: ${{ github.event.inputs.version }}/' manifests/setup/fluent-operator-deployment.yaml
-          sed -i 's/fluent-operator:latest/fluent-operator: ${{ github.event.inputs.version }}/' manifests/setup/setup.yaml
+          sed -i 's/fluent-operator:latest/fluent-operator:${{ github.event.inputs.version }}/' manifests/setup/fluent-operator-deployment.yaml
+          sed -i 's/fluent-operator:latest/fluent-operator:${{ github.event.inputs.version }}/' manifests/setup/setup.yaml
 
       - name: Update version in values.yaml
         run: |
-          sed -i 's/tag: .*/tag: ${{ github.event.inputs.version }}/' charts/fluent-operator/values.yaml
+          sed -i '/repository: "kubesphere\/fluent-operator"/!b;n;s/tag: .*/tag: "${{ github.event.inputs.version }}"/' charts/fluent-operator/values.yaml
+
       - name: Update version
         run: |
           sed -i 's/latest/${{ github.event.inputs.version }}/' VERSION
+
       - name: Commit & Push changes
         run: |
           git add manifests/setup/fluent-operator-deployment.yaml manifests/setup/setup.yaml charts/fluent-operator/values.yaml
           git commit -m "Bump version to ${{ github.event.inputs.version }}"
-          git push --set-upstream origin release-v3.3.0
+          git push --set-upstream origin release-release-${{ github.event.inputs.version }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
@@ -50,6 +68,6 @@ jobs:
             - manifests/setup/setup.yaml
 
             Please review and merge to release the new version.
-          branch: release-${{ github.event.inputs.version }}
-          base: main
+          branch: release-release-${{ github.event.inputs.version }}
+          base: release-${{ github.event.inputs.version }}
           labels: release
