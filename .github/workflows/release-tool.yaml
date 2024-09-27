@@ -34,10 +34,11 @@ jobs:
       - name: Update version
         run: |
           sed -i 's/latest/${{ github.event.inputs.version }}/' VERSION
-      - name: Commit changes
+      - name: Commit & Push changes
         run: |
           git add manifests/setup/fluent-operator-deployment.yaml manifests/setup/setup.yaml charts/fluent-operator/values.yaml
           git commit -m "Bump version to ${{ github.event.inputs.version }}"
+          git push --set-upstream origin release-v3.3.0
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
