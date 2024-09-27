@@ -9,6 +9,7 @@ on:
 
 jobs:
   create-release-branch:
+    name: create release branch
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,8 +24,8 @@ jobs:
         run: |
           git checkout -b release-${{ github.event.inputs.version }}
           git push --set-upstream origin release-${{ github.event.inputs.version }}
-  
   create-release-pr:
+    name: create release pr
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
