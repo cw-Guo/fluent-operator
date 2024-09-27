@@ -28,7 +28,7 @@ jobs:
   create-release-pr:
     name: create release pr
     runs-on: ubuntu-latest
-    needs: create-release-branch
+    if: always()
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -59,7 +59,7 @@ jobs:
         run: |
           git add manifests/setup/fluent-operator-deployment.yaml manifests/setup/setup.yaml charts/fluent-operator/values.yaml VERSION
           git commit -m "Bump version to ${{ github.event.inputs.version }}"
-          git push --set-upstream origin release-release-${{ github.event.inputs.version }}
+          git push --set-upstream origin release-release-${{ github.event.inputs.version }} --force
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
